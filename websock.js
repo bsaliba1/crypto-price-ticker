@@ -1,34 +1,54 @@
 const WebSocket = require('ws');
-const hello_message = `{
-  "type": "hello",
-  "apikey": "2995043B-4497-448F-A913-2C3A04584C6E",
-  "heartbeat": false,
-  "subscribe_data_type": ["trade"],
-  "subscribe_filter_symbol_id": [
-    "BITSTAMP_SPOT_BTC$",
-    "BITFINEX_SPOT_BTC$",
-    "COINBASE_BTC$",
-    "ITBIT_BTC$"
+const api_url = 'wss://ws-feed.pro.coinbase.com'
+const initiation_message = `{
+    "type": "subscribe",
+    "product_ids": [
+        "ETH-USD",
+        "BTC-USD"
+    ],
+    "channels": [
+        "level2",
+        "heartbeat",
+        {
+            "name": "ticker",
+            "product_ids": [
+                "ETH-USD",
+                "BTC-USD"  
+            ]
+        }
     ]
 }`
 
-function parse_message(message) {
-  // if (message["type"] == "exrate") {
-    console.log(message)
-  // }
+function parse_price(price_string) {
+  return parseFloat(price_string).toFixed(2)
 }
 
-async function test() {
+function parse_time(time_string) {
+  return new Date(time_string)
+}
 
-  client = new WebSocket('wss://ws.coinapi.io/v1/');
+function parse_message(raw_message) {
+  message = JSON.parse(raw_message)
+  if (message["type"] == "ticker") {
+    asset = message["product_id"]
+    price = parse_price(message["price"])
+    time = parse_time(message["time"])
+    format_output = `Asset: ${asset}| Price: ${price}| Time: ${time}`
+    console.log(format_output)
+  }
+}
+
+async function retrieveExchangeRates() {
+
+  client = new WebSocket(api_url);
 
   client.on('message', msg => parse_message(msg));
 
   // Wait for the client to connect using async/await
   await new Promise(resolve => client.once('open', resolve));
 
-  console.log("Connected to CoinAPI Websocket")
-  client.send(hello_message)
+  console.log("Connected to CoinBase Websocket")
+  client.send(initiation_message)
 }
 
-test()
+retrieveExchangeRates()
