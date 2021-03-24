@@ -1,7 +1,7 @@
 {
   "name": "crypto-price-ticker",
   "version": "1.0.1",
-  "description": "",
+  "description": "A crypto price price tracker which uses the Coinbase WebSocket API to track prices in real time",
   "main": "ticker.js",
   "dependencies": {
     "websocket": "^1.0.33",
