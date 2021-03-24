@@ -1,5 +1,5 @@
 {
-  "name": "cypto-price-ticker",
+  "name": "crypto-price-ticker",
   "version": "1.0.0",
   "description": "",
   "main": "ticker.js",
