@@ -1,1 +1,5 @@
-# crypto-prices
+# Crypto Price Ticker
+## Installation
+```
+npm install
+```

@@ -95,3 +95,4 @@ class Ticker {
 }
 
 module.exports = {Ticker}
+exports.ticker = Ticker

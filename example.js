@@ -1,4 +1,4 @@
-const { Ticker } = require('./Ticker')
+const { Ticker } = require('./ticker')
 
 function timeout(ms) { //pass a time in milliseconds to this function
   return new Promise(resolve => setTimeout(resolve, ms));
