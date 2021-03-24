@@ -1,11 +1,11 @@
-const { Ticker } = require('./ticker')
+const CoinbaseTicker = require('./ticker')
 
 function timeout(ms) { //pass a time in milliseconds to this function
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 async function example(){
-  let ticker = new Ticker();
+  let ticker = new CoinbaseTicker.Ticker();
   await ticker.openConnection();
   console.log(`Bitcoin price: ${ticker.bitcoin()}`);
   console.log(`Ethereum price: ${ticker.ethereum()}`);

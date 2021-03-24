@@ -1,13 +1,11 @@
 {
-  "name": "coinapi",
+  "name": "cypto-price-ticker",
   "version": "1.0.0",
   "description": "",
   "main": "ticker.js",
   "dependencies": {
-    "uuidv4": "^6.2.6",
     "websocket": "^1.0.33",
-    "ws": "^7.4.4",
-    "wscat": "^4.0.1"
+    "ws": "^7.4.4"
   },
   "devDependencies": {},
   "scripts": {
