@@ -4,11 +4,15 @@ function timeout(ms) { //pass a time in milliseconds to this function
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function example(ticker) {
-  await timeout(5000);
-  console.log(ticker.bitcoin);
-  console.log(ticker.ethereum);
+async function example(){
+  let ticker = new Ticker();
+  await ticker.openConnection();
+  console.log(`Bitcoin price: ${ticker.bitcoin()}`);
+  console.log(`Ethereum price: ${ticker.ethereum()}`);
+  await timeout(1200);
+  console.log(`Bitcoin price: ${ticker.bitcoin()}`);
+  console.log(`Ethereum price: ${ticker.ethereum()}`);
+  ticker.closeConnection();
 }
 
-let ticker = new Ticker();
-example(ticker);
+example();

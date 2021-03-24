@@ -1,12 +1,13 @@
 const WebSocket = require('ws');
 const API_URL = 'wss://ws-feed.pro.coinbase.com';
 const BITCOIN = "BTC-USD";
-const ETHEREUM = "ETH-USD"
+const ETHEREUM = "ETH-USD";
+const ASSETS = [BITCOIN, ETHEREUM]
 const SUBSCRIPTION_MESSAGE = `{
   "type": "subscribe",
     "product_ids": [
-        "ETH-USD",
-        "BTC-USD"
+        "${ETHEREUM}",
+        "${BITCOIN}"
     ],
     "channels": [
         "level2",
@@ -14,8 +15,8 @@ const SUBSCRIPTION_MESSAGE = `{
         {
             "name": "ticker",
             "product_ids": [
-                "ETH-USD",
-                "BTC-USD"  
+                "${ETHEREUM}",
+                "${BITCOIN}"  
             ]
         }
     ]
@@ -24,34 +25,53 @@ const SUBSCRIPTION_MESSAGE = `{
 class Ticker {
 
   constructor(){
-    this.bitcoin = 0;
-    this.ethereum = 0;
-    this.retrieveExchangeRates();
+    this.assetPrices = ASSETS.reduce((acc,curr)=> (acc[curr]=undefined,acc),{});
+    this.client = undefined;
   }
-  
-  async retrieveExchangeRates() {
-    let client = new WebSocket(API_URL);
+
+  // Opens the connection and waits till all prices are populated before resolving
+  async openConnection() {
+    this.client = this.client || new WebSocket(API_URL);
   
     // Wait for the client to connect using async/await
-    await new Promise(resolve => client.once('open', resolve));
+    await new Promise(resolve => this.client.once('open', resolve));
+    
+    this.client.send(SUBSCRIPTION_MESSAGE)
 
     // Whenever websocket sends a new message containing updated prices, update instance variables 
-    client.on('message', msg => this.update_prices(msg));
+    await new Promise((resolve, reject) => this.client.on("message", (msg) => {
+      this.update_prices(msg) 
+      if (this.allPricesPresent()) {
+        resolve();
+      }
+    }));
+  }
+
+  closeConnection() {
+    this.client.close();
+  }
+
+  bitcoin() {
+    return this.assetPrices[BITCOIN]
+  }
+
+  ethereum() {
+    return this.assetPrices[ETHEREUM]
+  }
   
-    // console.log("Connected to CoinBase Websocket")
-    client.send(SUBSCRIPTION_MESSAGE)
+  // PRIVATE
+
+  allPricesPresent(){
+    let retVal = true;
+    for(let asset in this.assetPrices){ retVal = retVal && (this.assetPrices[asset] != undefined) }
+    return retVal
   }
 
   update_prices(message) {
     let asset, price
     [asset, price] = this.parse_message(message);
-    switch(asset){
-      case BITCOIN:
-        this.bitcoin = price;
-        break;
-      case ETHEREUM:
-        this.ethereum = price;
-        break;
+    if (ASSETS.includes(asset)) {
+      this.assetPrices[asset] = price;
     }
   }
 
